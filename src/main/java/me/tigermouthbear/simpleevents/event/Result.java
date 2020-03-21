@@ -1,4 +1,4 @@
-package me.tigermouthbear.simpleevents;
+package me.tigermouthbear.simpleevents.event;
 
 /***
  * Values for an {@link Event}'s result

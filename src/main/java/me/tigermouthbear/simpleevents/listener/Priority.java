@@ -1,4 +1,4 @@
-package me.tigermouthbear.simpleevents;
+package me.tigermouthbear.simpleevents.listener;
 
 /**
  * Common values for {@link EventListener} priorities

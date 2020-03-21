@@ -18,16 +18,19 @@ dependencies {
 ## Java
 ```
 public class Main {
-	// Create new EventManager/EventBus
-	static EventManager EVENT_BUS = new EventManager();
+	static EventManager EVENT_MANAGER = new EventManager(); // Create new EventManager
 
 	public static void main(String[] args) {
-		TestEvent event = EVENT_BUS.post(new TestEvent()); // Create event and post it to the EventManager/EventBus
+        EVENT_MANAGER.register(new Main()); // Register object to EventManager
+		TestEvent event = EVENT_MANAGER.post(new TestEvent()); // Create event and post it to the EventManager
 		System.out.println(event.text); // prints "lowest"
 	}
 
-	static EventListener<TestEvent> lowest = new EventListener<>(Priority.LOWEST, event -> event.text = "lowest");
-	static EventListener<TestEvent> highest = new EventListener<>(Priority.HIGHEST, event -> event.text = "highest");
+    @EventHandler
+	EventListener<TestEvent> lowest = new EventListener<>(Priority.LOWEST, event -> event.text = "lowest");
+
+    @EventHandler
+	EventListener<TestEvent> highest = new EventListener<>(Priority.HIGHEST, event -> event.text = "highest");
 }
 
 class TestEvent extends Event {

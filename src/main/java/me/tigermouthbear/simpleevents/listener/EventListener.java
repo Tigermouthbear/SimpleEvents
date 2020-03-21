@@ -1,15 +1,17 @@
-package me.tigermouthbear.simpleevents;
+package me.tigermouthbear.simpleevents.listener;
 
+import me.tigermouthbear.simpleevents.EventManager;
+import me.tigermouthbear.simpleevents.event.IEvent;
 import net.jodah.typetools.TypeResolver;
 
 import java.util.function.Consumer;
 
 /**
- * Links an {@link Event} to a consumer through the {@link EventManager}
+ * Links an {@link IEvent} to a consumer through the {@link EventManager}
  * @author Tigermouthbear
  * @since 3/11/20
  */
-public class EventListener<T extends Event> {
+public class EventListener<T extends IEvent> {
 	/**
 	 * Stores priority of {@link EventListener}
 	 */
@@ -21,7 +23,7 @@ public class EventListener<T extends Event> {
 	private Consumer<T> consumer;
 
 	/**
-	 * Stores class of {@link Event} listened for
+	 * Stores class of {@link IEvent} listened for
 	 */
 	private Class<T> eventClass;
 
@@ -43,15 +45,13 @@ public class EventListener<T extends Event> {
 		this.priority = priority;
 		this.consumer = consumer;
 		this.eventClass = (Class<T>)TypeResolver.resolveRawArgument(Consumer.class, consumer.getClass());
-
-		EventManager.listeners.add(this);
 	}
 
 	/**
 	 * Getter for
 	 * @return Priority of {@link EventListener}
 	 */
-	int getPriority() {
+	public int getPriority() {
 		return priority;
 	}
 
@@ -59,15 +59,15 @@ public class EventListener<T extends Event> {
 	 * Getter for consumer
 	 * @return Consumer passed through {@link EventListener}
 	 */
-	Consumer<T> getConsumer() {
+	public Consumer<T> getConsumer() {
 		return consumer;
 	}
 
 	/**
 	 * Getter for eventClass
-	 * @return Class of {@link Event} which it is listening for
+	 * @return Class of {@link IEvent} which it is listening for
 	 */
-	Class<T> getEventClass() {
+	public Class<T> getEventClass() {
 		return eventClass;
 	}
 }
