@@ -6,9 +6,9 @@ import me.tigermouthbear.simpleevents.listener.EventHandler;
 import me.tigermouthbear.simpleevents.listener.EventListener;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Used to post {@link Event}s to {@link EventListener}s and register/unregister {@link EventListener}s
@@ -22,9 +22,10 @@ public class EventManager {
 	private static final PriorityComparator PRIORITY_COMPARATOR = new PriorityComparator();
 
 	/**
-	 * Holds all {@link EventListener}s for accpeting consumers in post()
+	 * Holds all {@link EventListener}s for accepting consumers in post()
+	 * Uses a CopyOnWrite to prevent Concurrent Modification Exceptions when dispatching events
 	 */
-	private final List<EventListener> listeners = new ArrayList<>();
+	private final List<EventListener> listeners = new CopyOnWriteArrayList<>();
 
 	/**
 	 * Accepts all consumers from the {@link EventListener}s of the {@link IEvent} passed through
@@ -33,10 +34,12 @@ public class EventManager {
 	 * @return Event passed through
 	 */
 	public <T extends IEvent> T post(T event) {
-		listeners.stream().sorted(PRIORITY_COMPARATOR).filter(listener ->
-				listener.getEventClass() == event.getClass()).forEach(listener ->
-						listener.getConsumer().accept(event));
-
+		// Sorting is not needed here, as it is done when objects are added to the list
+		for (EventListener listener : this.listeners) {
+			if (listener.getEventClass() == event.getClass()) {
+				listener.getConsumer().accept(event);
+			}
+		}
 		return event;
 	}
 
@@ -54,10 +57,14 @@ public class EventManager {
 					field.setAccessible(true);
 					listener = (EventListener) field.get(obj);
 					field.setAccessible(accessible);
-				} catch (IllegalAccessException e) { }
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
 
 				if(listener != null) {
 					listeners.add(listener);
+					// Sort by priority on adding, so continuous sorting can be avoided
+					this.listeners.sort(PRIORITY_COMPARATOR);
 				}
 			}
 		}
@@ -77,7 +84,9 @@ public class EventManager {
 					field.setAccessible(true);
 					listener = (EventListener) field.get(obj);
 					field.setAccessible(accessible);
-				} catch (IllegalAccessException e) { }
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
 
 				if(listener != null) {
 					listeners.remove(listener);
@@ -92,6 +101,8 @@ public class EventManager {
 	 */
 	public void register(EventListener listener) {
 		listeners.add(listener);
+		// Sort by priority on adding, so continuous sorting can be avoided
+		this.listeners.sort(PRIORITY_COMPARATOR);
 	}
 
 	/**
