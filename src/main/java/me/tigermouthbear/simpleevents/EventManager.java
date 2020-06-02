@@ -1,7 +1,6 @@
 package me.tigermouthbear.simpleevents;
 
 import me.tigermouthbear.simpleevents.event.Event;
-import me.tigermouthbear.simpleevents.event.IEvent;
 import me.tigermouthbear.simpleevents.listener.EventHandler;
 import me.tigermouthbear.simpleevents.listener.EventListener;
 
@@ -28,12 +27,11 @@ public class EventManager {
 	private final List<EventListener> listeners = new CopyOnWriteArrayList<>();
 
 	/**
-	 * Accepts all consumers from the {@link EventListener}s of the {@link IEvent} passed through
-	 * @param event {@link IEvent} to post to {@link EventManager}
-	 * @param <T> Generifies {@link IEvent}
+	 * Accepts all consumers from the {@link EventListener}s of the event passed through
+	 * @param event event to post to {@link EventManager}
 	 * @return Event passed through
 	 */
-	public <T extends IEvent> T post(T event) {
+	public <T> T post(T event) {
 		// Sorting is not needed here, as it is done when objects are added to the list
 		for (EventListener listener : this.listeners) {
 			if (listener.getEventClass() == event.getClass()) {

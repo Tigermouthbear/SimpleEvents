@@ -1,11 +1,11 @@
 package me.tigermouthbear.simpleevents.event;
 
 /**
- * The basic implementation of {@link IEvent}
+ * The basic implementation of an event
  * @author Tigermouthbear
  * @since 3/11/20
  */
-public abstract class Event implements IEvent {
+public abstract class Event {
 	/**
 	 * Result of {@link Event},  default Result.NONE
 	 */

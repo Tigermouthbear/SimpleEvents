@@ -1,17 +1,17 @@
 package me.tigermouthbear.simpleevents.listener;
 
 import me.tigermouthbear.simpleevents.EventManager;
-import me.tigermouthbear.simpleevents.event.IEvent;
 import net.jodah.typetools.TypeResolver;
 
 import java.util.function.Consumer;
 
 /**
- * Links an {@link IEvent} to a consumer through the {@link EventManager}
+ * Links an event to a consumer through the {@link EventManager}
+ *
  * @author Tigermouthbear
  * @since 3/11/20
  */
-public class EventListener<T extends IEvent> {
+public class EventListener<T> {
 	/**
 	 * Stores priority of {@link EventListener}
 	 */
@@ -23,12 +23,13 @@ public class EventListener<T extends IEvent> {
 	private Consumer<T> consumer;
 
 	/**
-	 * Stores class of {@link IEvent} listened for
+	 * Stores class of the event listened for
 	 */
 	private Class<T> eventClass;
 
 	/**
 	 * Constructor for {@link EventListener} with the default {@link Priority}
+	 *
 	 * @param consumer Consumer to accept on listen
 	 */
 	public EventListener(Consumer<T> consumer) {
@@ -37,6 +38,7 @@ public class EventListener<T extends IEvent> {
 
 	/**
 	 * Constructor for {@link EventListener}
+	 *
 	 * @param priority Priority of listener
 	 * @param consumer Consumer to accept on listen
 	 */
@@ -44,11 +46,12 @@ public class EventListener<T extends IEvent> {
 	public EventListener(int priority, Consumer<T> consumer) {
 		this.priority = priority;
 		this.consumer = consumer;
-		this.eventClass = (Class<T>)TypeResolver.resolveRawArgument(Consumer.class, consumer.getClass());
+		this.eventClass = (Class<T>) TypeResolver.resolveRawArgument(Consumer.class, consumer.getClass());
 	}
 
 	/**
 	 * Getter for
+	 *
 	 * @return Priority of {@link EventListener}
 	 */
 	public int getPriority() {
@@ -57,6 +60,7 @@ public class EventListener<T extends IEvent> {
 
 	/**
 	 * Getter for consumer
+	 *
 	 * @return Consumer passed through {@link EventListener}
 	 */
 	public Consumer<T> getConsumer() {
@@ -65,7 +69,8 @@ public class EventListener<T extends IEvent> {
 
 	/**
 	 * Getter for eventClass
-	 * @return Class of {@link IEvent} which it is listening for
+	 *
+	 * @return Class of the event which it is listening for
 	 */
 	public Class<T> getEventClass() {
 		return eventClass;
