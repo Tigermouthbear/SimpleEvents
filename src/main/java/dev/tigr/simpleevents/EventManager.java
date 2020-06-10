@@ -1,8 +1,8 @@
-package me.tigermouthbear.simpleevents;
+package dev.tigr.simpleevents;
 
-import me.tigermouthbear.simpleevents.event.Event;
-import me.tigermouthbear.simpleevents.listener.EventHandler;
-import me.tigermouthbear.simpleevents.listener.EventListener;
+import dev.tigr.simpleevents.event.Event;
+import dev.tigr.simpleevents.listener.EventHandler;
+import dev.tigr.simpleevents.listener.EventListener;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;

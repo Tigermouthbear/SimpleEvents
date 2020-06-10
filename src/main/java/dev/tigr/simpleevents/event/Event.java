@@ -1,4 +1,4 @@
-package me.tigermouthbear.simpleevents.event;
+package dev.tigr.simpleevents.event;
 
 /**
  * The basic implementation of an event

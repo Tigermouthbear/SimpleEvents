@@ -1,6 +1,6 @@
-package me.tigermouthbear.simpleevents.listener;
+package dev.tigr.simpleevents.listener;
 
-import me.tigermouthbear.simpleevents.EventManager;
+import dev.tigr.simpleevents.EventManager;
 import net.jodah.typetools.TypeResolver;
 
 import java.util.function.Consumer;
