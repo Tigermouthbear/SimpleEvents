@@ -1,17 +1,28 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
     id 'java'
 }
 
-group 'simpleevents'
-version '1.0-SNAPSHOT'
+group = "dev.tigr"
+archivesBaseName = "simpleevents"
+version '1.0'
 
 sourceCompatibility = 1.8
+
+shadowJar() {
+    dependencies {
+        include(dependency("net.jodah:typetools"))
+    }
+
+    classifier = "release"
+}
+
+build.dependsOn.add("shadowJar")
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'net.jodah', name: 'typetools', version: '0.5.0'
 }
