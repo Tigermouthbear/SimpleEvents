@@ -5,9 +5,8 @@ import dev.tigr.simpleevents.listener.EventHandler;
 import dev.tigr.simpleevents.listener.EventListener;
 
 import java.lang.reflect.Field;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * Used to post {@link Event}s to {@link EventListener}s and register/unregister {@link EventListener}s
@@ -21,10 +20,9 @@ public class EventManager {
 	private static final PriorityComparator PRIORITY_COMPARATOR = new PriorityComparator();
 
 	/**
-	 * Holds all {@link EventListener}s for accepting consumers in post()
-	 * Uses a CopyOnWrite to prevent Concurrent Modification Exceptions when dispatching events
+	 * Stores a map with key of Event and values of the EventListeners for that event
 	 */
-	private final List<EventListener> listeners = new CopyOnWriteArrayList<>();
+	private final Map<Class<?>, List<EventListener>> listenerMap = new HashMap<>();
 
 	/**
 	 * Accepts all consumers from the {@link EventListener}s of the event passed through
@@ -32,91 +30,122 @@ public class EventManager {
 	 * @return Event passed through
 	 */
 	public <T> T post(T event) {
-		// Sorting is not needed here, as it is done when objects are added to the list
-		for (EventListener listener : this.listeners) {
-			if (listener.getEventClass() == event.getClass()) {
-				listener.getConsumer().accept(event);
-			}
-		}
+		listenerMap.get(event.getClass()).forEach(eventListener -> eventListener.invoke(event));
 		return event;
 	}
 
 	/**
-	 * Adds all the {@link EventListener}s in an object's class to the listener list for receiving posts
-	 * @param obj Instance of class with {@link EventListener}s to add to listeners
-	 */
-	public void register(Object obj) {
-		for(Field field: obj.getClass().getDeclaredFields()) {
-			if(field.isAnnotationPresent(EventHandler.class)) {
-				EventListener listener = null;
-
-				try {
-					boolean accessible = field.isAccessible();
-					field.setAccessible(true);
-					listener = (EventListener) field.get(obj);
-					field.setAccessible(accessible);
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-
-				if(listener != null) {
-					listeners.add(listener);
-					// Sort by priority on adding, so continuous sorting can be avoided
-					this.listeners.sort(PRIORITY_COMPARATOR);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Removes all the {@link EventListener}s in an object's class from the listener list
-	 * @param obj Instance of class with {@link EventListener}s to remove to listeners
-	 */
-	public void unregister(Object obj) {
-		for(Field field: obj.getClass().getDeclaredFields()) {
-			if(field.isAnnotationPresent(EventHandler.class)) {
-				EventListener listener = null;
-
-				try {
-					boolean accessible = field.isAccessible();
-					field.setAccessible(true);
-					listener = (EventListener) field.get(obj);
-					field.setAccessible(accessible);
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-
-				if(listener != null) {
-					listeners.remove(listener);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Adds a listener to the listener list
+	 * Registers a listener to the {@link EventManager}
 	 * @param listener {@link EventListener} to add to the listener list
 	 */
 	public void register(EventListener listener) {
+		Class<?> eventClass = listener.getEventClass();
+
+		// get or set listener list for class
+		List<EventListener> listeners;
+		if(listenerMap.containsKey(eventClass)) listeners = listenerMap.get(eventClass);
+		else {
+			listeners = new ArrayList<>();
+			listenerMap.put(eventClass, listeners);
+		}
+
+		// add listener and sort listeners by priority
 		listeners.add(listener);
-		// Sort by priority on adding, so continuous sorting can be avoided
-		this.listeners.sort(PRIORITY_COMPARATOR);
+		listeners.sort(PRIORITY_COMPARATOR);
 	}
 
 	/**
-	 * Removes a listener from the listener list
+	 * Unregisters a listener from the {@link EventManager}
 	 * @param listener {@link EventListener} to remove from the listener list
 	 */
 	public void unregister(EventListener listener) {
-		listeners.remove(listener);
+		List<EventListener> listeners = listenerMap.get(listener.getEventClass());
+		if(listeners != null) listeners.remove(listener);
 	}
 
 	/**
-	 * Getter for listeners
-	 * @return {@link List} of listeners
+	 * Registers the listener of a field
+	 * @param field field to be registered
+	 * @param object object which field resides in
 	 */
-	public List<EventListener> getListeners() {
-		return listeners;
+	public void register(Field field, Object object) {
+		EventListener listener = getListenerFromField(field, object);
+		if(listener != null) register(listener);
+	}
+
+	/**
+	 * Unregisters the listener of a field
+	 * @param field field to be unregistered
+	 * @param object object which field resides in
+	 */
+	public void unregister(Field field, Object object) {
+		EventListener listener = getListenerFromField(field, object);
+		if(listener != null) unregister(listener);
+	}
+
+	/**
+	 * Registers all {@link EventListener}s in an object
+	 * @param object Instance of class with {@link EventListener}s to add to listeners
+	 */
+	public void register(Object object) {
+		for(Field field: object.getClass().getDeclaredFields()) {
+			if(!Modifier.isStatic(field.getModifiers()) && field.isAnnotationPresent(EventHandler.class))
+				register(field, object);
+		}
+	}
+
+	/**
+	 * Unregisters all {@link EventListener}s in an object
+	 * @param object Instance of class with {@link EventListener}s to remove to listeners
+	 */
+	public void unregister(Object object) {
+		for(Field field: object.getClass().getDeclaredFields()) {
+			if(!Modifier.isStatic(field.getModifiers()) && field.isAnnotationPresent(EventHandler.class))
+				unregister(field, object);
+		}
+	}
+
+	/**
+	 * Registers all static {@link EventListener}s in a class
+	 * @param clazz
+	 */
+	public void register(Class<?> clazz) {
+		for(Field field: clazz.getDeclaredFields()) {
+			if(Modifier.isStatic(field.getModifiers())&& field.isAnnotationPresent(EventHandler.class))
+				register(field, null); // pass null for static
+		}
+	}
+
+	/**
+	 * Unregisters all static {@link EventListener}s in a class
+	 * @param clazz
+	 */
+	public void unregister(Class<?> clazz) {
+		for(Field field: clazz.getDeclaredFields()) {
+			if(Modifier.isStatic(field.getModifiers())&& field.isAnnotationPresent(EventHandler.class))
+				unregister(field, null); // pass null for static
+		}
+	}
+
+	/**
+	 * Gets the {@link EventListener} from a field
+	 * @param field listener to get
+	 * @param object object the listener is in
+	 * @return the {@link EventListener}
+	 */
+	private static EventListener getListenerFromField(Field field, Object object) {
+		EventListener listener = null;
+
+		try {
+			boolean accessible = field.isAccessible();
+			field.setAccessible(true);
+			listener = (EventListener) field.get(object);
+			field.setAccessible(accessible);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		return listener;
 	}
 
 	/**
