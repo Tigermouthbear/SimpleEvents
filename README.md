@@ -27,13 +27,13 @@ public class Test {
 		System.out.println(event.isCancelled()); // prints false
 	}
 
-    @EventHandler
+	@EventHandler
 	EventListener<TestEvent> lowest = new EventListener<>(Priority.LOWEST, event -> {
 		event.text = "lowest";
 		event.setCancelled(false);
 	});
 
-    @EventHandler
+	@EventHandler
 	EventListener<TestEvent> highest = new EventListener<>(Priority.HIGHEST, event -> {
 		event.text = "highest";
 		event.setCancelled(true);
