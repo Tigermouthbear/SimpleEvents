@@ -30,7 +30,8 @@ public class EventManager {
 	 * @return Event passed through
 	 */
 	public <T> T post(T event) {
-		listenerMap.get(event.getClass()).forEach(eventListener -> eventListener.invoke(event));
+		Class<?> eventClass = event.getClass();
+		if(listenerMap.containsKey(eventClass)) listenerMap.get(eventClass).forEach(eventListener -> eventListener.invoke(event));
 		return event;
 	}
 
