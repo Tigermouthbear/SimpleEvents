@@ -7,6 +7,7 @@ import dev.tigr.simpleevents.listener.EventListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Used to post {@link Event}s to {@link EventListener}s and register/unregister {@link EventListener}s
@@ -46,7 +47,7 @@ public class EventManager {
 		List<EventListener> listeners;
 		if(listenerMap.containsKey(eventClass)) listeners = listenerMap.get(eventClass);
 		else {
-			listeners = new ArrayList<>();
+			listeners = new CopyOnWriteArrayList<>();
 			listenerMap.put(eventClass, listeners);
 		}
 
