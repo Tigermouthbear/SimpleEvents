@@ -1,13 +1,36 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
-    id 'java'
+    id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "java"
 }
 
 group = "dev.tigr"
 archivesBaseName = "simpleevents"
-version '1.2'
+version "1.2"
 
 sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "net.jodah:typetools:0.6.3"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = "javadoc"
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
 
 shadowJar() {
     dependencies {
@@ -18,11 +41,3 @@ shadowJar() {
 }
 
 build.dependsOn.add("shadowJar")
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile group: 'net.jodah', name: 'typetools', version: '0.6.3'
-}

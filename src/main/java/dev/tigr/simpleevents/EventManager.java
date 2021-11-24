@@ -28,6 +28,7 @@ public class EventManager {
 	/**
 	 * Accepts all consumers from the {@link EventListener}s of the event passed through
 	 * @param event event to post to {@link EventManager}
+	 * @param <T> event type to post
 	 * @return Event passed through
 	 */
 	public <T> T post(T event) {
