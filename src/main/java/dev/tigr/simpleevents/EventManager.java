@@ -109,7 +109,7 @@ public class EventManager {
 
 	/**
 	 * Registers all static {@link EventListener}s in a class
-	 * @param clazz
+	 * @param clazz parent class of listeners to register
 	 */
 	public void register(Class<?> clazz) {
 		for(Field field: clazz.getDeclaredFields()) {
@@ -120,7 +120,7 @@ public class EventManager {
 
 	/**
 	 * Unregisters all static {@link EventListener}s in a class
-	 * @param clazz
+	 * @param clazz parent class of listeners to unregister
 	 */
 	public void unregister(Class<?> clazz) {
 		for(Field field: clazz.getDeclaredFields()) {

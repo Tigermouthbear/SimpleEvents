@@ -12,7 +12,7 @@ public class EventListener<T> {
 	/**
 	 * Stores priority of {@link EventListener}
 	 */
-	private int priority;
+	private final int priority;
 
 	/**
 	 * Stores consumer of {@link EventListener}
@@ -22,7 +22,7 @@ public class EventListener<T> {
 	/**
 	 * Stores class of the event listened for
 	 */
-	private Class<T> eventClass;
+	private final Class<T> eventClass;
 
 	/**
 	 * Constructor for {@link EventListener} with the default {@link Priority}
