@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile "dev.tigr:simpleevents:1.0"
+    compile "dev.tigr:simpleevents:1.2"
 }
 ```
 
