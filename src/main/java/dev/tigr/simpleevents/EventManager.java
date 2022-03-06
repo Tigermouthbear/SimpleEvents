@@ -91,10 +91,13 @@ public class EventManager {
 	 * @param object Instance of class with {@link EventListener}s to add to listeners
 	 */
 	public void register(Object object) {
-		for(Field field: object.getClass().getDeclaredFields()) {
-			if(!Modifier.isStatic(field.getModifiers()) && field.isAnnotationPresent(EventHandler.class))
-				register(field, object);
-		}
+		Class<?> clazz = object.getClass();
+		do {
+			for(Field field: clazz.getDeclaredFields()) {
+				if(!Modifier.isStatic(field.getModifiers()) && field.isAnnotationPresent(EventHandler.class))
+					register(field, object);
+			}
+		} while((clazz = clazz.getSuperclass()) != Object.class);
 	}
 
 	/**
@@ -102,10 +105,13 @@ public class EventManager {
 	 * @param object Instance of class with {@link EventListener}s to remove to listeners
 	 */
 	public void unregister(Object object) {
-		for(Field field: object.getClass().getDeclaredFields()) {
-			if(!Modifier.isStatic(field.getModifiers()) && field.isAnnotationPresent(EventHandler.class))
-				unregister(field, object);
-		}
+		Class<?> clazz = object.getClass();
+		do {
+			for(Field field: clazz.getDeclaredFields()) {
+				if(!Modifier.isStatic(field.getModifiers()) && field.isAnnotationPresent(EventHandler.class))
+					unregister(field, object);
+			}
+		} while((clazz = clazz.getSuperclass()) != Object.class);
 	}
 
 	/**
@@ -113,10 +119,12 @@ public class EventManager {
 	 * @param clazz parent class of listeners to register
 	 */
 	public void register(Class<?> clazz) {
-		for(Field field: clazz.getDeclaredFields()) {
-			if(Modifier.isStatic(field.getModifiers())&& field.isAnnotationPresent(EventHandler.class))
-				register(field, null); // pass null for static
-		}
+		do {
+			for(Field field: clazz.getDeclaredFields()) {
+				if(Modifier.isStatic(field.getModifiers())&& field.isAnnotationPresent(EventHandler.class))
+					register(field, null); // pass null for static
+			}
+		} while((clazz = clazz.getSuperclass()) != Object.class);
 	}
 
 	/**
@@ -124,10 +132,12 @@ public class EventManager {
 	 * @param clazz parent class of listeners to unregister
 	 */
 	public void unregister(Class<?> clazz) {
-		for(Field field: clazz.getDeclaredFields()) {
-			if(Modifier.isStatic(field.getModifiers())&& field.isAnnotationPresent(EventHandler.class))
-				unregister(field, null); // pass null for static
-		}
+		do {
+			for(Field field: clazz.getDeclaredFields()) {
+				if(Modifier.isStatic(field.getModifiers())&& field.isAnnotationPresent(EventHandler.class))
+					unregister(field, null); // pass null for static
+			}
+		} while((clazz = clazz.getSuperclass()) != Object.class);
 	}
 
 	/**
